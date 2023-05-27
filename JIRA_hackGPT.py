@@ -66,18 +66,16 @@ else:
 
 date_string = datetime.datetime.now()
 
-load_dotenv()  
+load_dotenv()
 apiToken = os.environ.get("OPENAI_TOKEN")
 headers = {
-                    "Accept": "application/json; charset=utf-8",
-                    "Authorization": "Token" + str(apiToken)
-                }
+    "Accept": "application/json; charset=utf-8",
+    "Authorization": f"Token{str(apiToken)}",
+}
 
 
 
-if 'OPENAI_TOKEN' in os.environ:
-    pass
-else:
+if 'OPENAI_TOKEN' not in os.environ:
     os.environ['OPENAI_TOKEN'] = input('Enter API Key: ').replace(" ","")
 token = os.environ.get("OPENAI_TOKEN")
 hack=  "\n"*7 + r""" 
@@ -119,6 +117,7 @@ jira = JIRA(options=jira_options, basic_auth=('YOUR_JIRA_EMAIL', 'YOUR_JIRA_TOKE
 
 
 issues = jira.search_issues('type = bug ')
+model_engine = "davinci"
 for issue in issues:
     ticket = fade.brazil("JIRA Ticket Summary: ")
     summary = fade.water(issue.fields.summary)
@@ -128,7 +127,6 @@ for issue in issues:
     print(des_summary.rstrip('\n'))
     print(description)
     prompt = f"Fix the following issue: {issue.fields.description}"
-    model_engine = "davinci"
     completions = openai.Completion.create(
         engine=model_engine,
         prompt=prompt,

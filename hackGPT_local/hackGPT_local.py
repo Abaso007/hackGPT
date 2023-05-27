@@ -26,8 +26,7 @@ def download_webpage(url):
     response = requests.get(url)
     html_content = response.text
     soup = BeautifulSoup(html_content, "html.parser")
-    text_content = soup.get_text(separator=" ")
-    return text_content
+    return soup.get_text(separator=" ")
 
 st.set_page_config(page_title="𝚑𝚊𝚌𝚔🅶🅿🆃", page_icon="https://raw.githubusercontent.com/NoDataFound/hackGPT/main/res/hackgpt_fav.png", layout="wide")
 st.image('https://raw.githubusercontent.com/NoDataFound/hackGPT/main/res/hackGPT_logo.png', width=800)
@@ -117,8 +116,7 @@ def download_webpage(url):
     response = requests.get(url)
     html_content = response.text
     soup = BeautifulSoup(html_content, "html.parser")
-    text_content = soup.get_text(separator=" ")
-    return text_content
+    return soup.get_text(separator=" ")
 
 # Function to display model information
 def display_model_info(model_name):
@@ -140,7 +138,7 @@ selected_model = st.sidebar.selectbox("Select Model", list(model_info.keys()))
 default_temperature = 1.0
 temperature = st.sidebar.slider(
     "Temperature | Creative >0.5", min_value=0.0, max_value=1.0, step=0.1, value=default_temperature
-) 
+)
 if selected_model in ["T5", "BART"]:
     tokenizer = T5Tokenizer.from_pretrained(selected_model)
     model = T5ForConditionalGeneration.from_pretrained(selected_model)
@@ -149,7 +147,6 @@ else:
     model = AutoModelForQuestionAnswering.from_pretrained(models[selected_model])
 # Metrics
 num_models = len(model_info)
-num_models_new = 0
 num_urls_entered = 0
 num_urls_processed = 0
 num_documents_entered = 0
@@ -159,9 +156,7 @@ num_documents_processed = 0
 # st.title("Document Question Answering")
 st.subheader("Upload a document or enter a URL to answer questions about the content.")
 
-# Increment model count
-num_models_new += 1
-
+num_models_new = 0 + 1
 # Display metrics in a single row
 col1, col2, col3, col4 = st.columns(4)
 with col1:
@@ -201,21 +196,21 @@ if question:
         st.warning("Please upload a document or enter a URL.")
 
 
-    if text_content and question:
+if text_content and question:
     # Split the document into chunks of fixed length
-        max_chunk_length = 512
-        document_chunks = [text_content[i:i + max_chunk_length] for i in range(0, len(text_content), max_chunk_length)]
+    max_chunk_length = 512
+    document_chunks = [text_content[i:i + max_chunk_length] for i in range(0, len(text_content), max_chunk_length)]
 
-        # Answer each chunk separately
-        answers = []
-        for chunk in document_chunks:
-            inputs = tokenizer.encode_plus(question, chunk, max_length=512, truncation=True, return_tensors="pt")
-            answer = answer_question(inputs, question)
-            answers.append(answer)
+    # Answer each chunk separately
+    answers = []
+    for chunk in document_chunks:
+        inputs = tokenizer.encode_plus(question, chunk, max_length=512, truncation=True, return_tensors="pt")
+        answer = answer_question(inputs, question)
+        answers.append(answer)
 
-        # Combine answers from different chunks
-        answer = " ".join(answers)
-        answer = answer.replace("[SEP]", "").strip()
+    # Combine answers from different chunks
+    answer = " ".join(answers)
+    answer = answer.replace("[SEP]", "").strip()
 
-        st.write("Answer:")
-        st.write(answer)
+    st.write("Answer:")
+    st.write(answer)
