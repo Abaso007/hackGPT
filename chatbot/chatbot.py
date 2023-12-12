@@ -34,7 +34,7 @@ def get_persona_dropdown():
     persona_options = []
     personas = [f for f in os.listdir("personas") if os.path.isfile(os.path.join("personas", f))]
     for persona in personas:
-        persona_filename = "personas/" + persona
+        persona_filename = f"personas/{persona}"
         with open(persona_filename, "r") as f:
             persona_text = f.read()
         persona_name = persona.split('.')[0]
@@ -61,7 +61,7 @@ def handle_message_events(ack, body, logger):
     response = client.chat_postMessage(
         channel=body["event"]["channel"],
         thread_ts=body["event"]["event_ts"],
-        text=f":hackgpt: processing..."
+        text=":hackgpt: processing...",
     )
 
     if "persona" in prompt.lower().split():
