@@ -37,10 +37,8 @@ load_dotenv(".env")
 apiToken = os.environ.get('OPENAI_TOKEN')
 openai.api_key = apiToken
 
-if 'OPENAI_TOKEN' in os.environ:
-   pass
-else:
-  error='''           
+if 'OPENAI_TOKEN' not in os.environ:
+   error='''           
                      *   )           )            (   
                      `(     ( /((        (  (      )\   
                       )\(   )\())\  (    )\))(  ((((_) 
@@ -53,13 +51,13 @@ else:
                      88eee 88   8 88   8 8eeee8 88   8 
                                   
    \033[1;33mAttempting to Set OpenAI system variable with API key.'''
-  fadederror = fade.fire(error)
-  print(fadederror)
-  Path(".env").touch()
-  setting_token = open(".env", "a")
-  userkey = input('Enter OpenAI API Key: ').replace(" ","")
-  setting_token.write("OPENAI_TOKEN="+'"'+userkey+'"\n')
-   
+   fadederror = fade.fire(error)
+   print(fadederror)
+   Path(".env").touch()
+   setting_token = open(".env", "a")
+   userkey = input('Enter OpenAI API Key: ').replace(" ","")
+   setting_token.write("OPENAI_TOKEN="+'"'+userkey+'"\n')
+
 
 #@title ChatBot and Web UI for HackGPT
 #temp menu
@@ -70,12 +68,12 @@ args  = parser.parse_args()
 
 date_string = datetime.datetime.now()
 
-load_dotenv()  
+load_dotenv()
 apiToken = os.environ.get("OPENAI_TOKEN")
 headers = {
-                    "Accept": "application/json; charset=utf-8",
-                    "Authorization": "Token" + str(apiToken)
-                }
+    "Accept": "application/json; charset=utf-8",
+    "Authorization": f"Token{str(apiToken)}",
+}
 
 def progress(percent=0, width=15):
     hashes = width * percent // 100
@@ -88,11 +86,9 @@ for i in range(101):
     progress(i)
     sleep(.01)
 print('\n')
-print("𝙰𝙿𝙸 𝙲𝚘𝚗𝚏𝚒𝚐𝚞𝚛𝚊𝚝𝚒𝚘𝚗 𝚂𝚊𝚟𝚎𝚍 𝚝𝚘 .𝚎𝚗𝚟") 
-if 'OPENAI_TOKEN' in os.environ:
-    pass
-else:
-    os.environ['OPENAI_TOKEN'] = input('Enter API Key: ').replace(" ","")
+print("𝙰𝙿𝙸 𝙲𝚘𝚗𝚏𝚒𝚐𝚞𝚛𝚊𝚝𝚒𝚘𝚗 𝚂𝚊𝚟𝚎𝚍 𝚝𝚘 .𝚎𝚗𝚟")
+if 'OPENAI_TOKEN' not in os.environ:
+   os.environ['OPENAI_TOKEN'] = input('Enter API Key: ').replace(" ","")
 token = os.environ.get("OPENAI_TOKEN")
 hack=  "\n"*7 + r""" 
 
@@ -124,7 +120,7 @@ fadedgpt = fade.random(gpt)
 
 
 for pair in zip(*map(str.splitlines, (fadedhack, fadedgpt))): 
-  print(*pair)                                                                                                
+  print(*pair)
 #------------------------------------ main menu prompt  ------------------------------------ 
 
 with open('output/chat_hackGPT_log.csv', 'a+', encoding='UTF8', newline='') as f:
@@ -141,18 +137,15 @@ questions = [
 answers = inquirer.prompt(questions)
 hackgpt_persona = answers['Persona']
 
-if hackgpt_persona =='hackGPT':
-    hackGPT_mode = open('personas/hackGPTv1.md' ,"r")
-    hackGPT_mode = hackGPT_mode.read()
-    pass
-elif hackgpt_persona =='chatGPT-DEV':
-    hackGPT_mode = open('personas/DEVv1.md' ,"r")
-    hackGPT_mode = hackGPT_mode.read()
-    pass
-elif hackgpt_persona =='DAN':
-    hackGPT_mode = open('personas/DANv11.md' ,"r")
-    hackGPT_mode = hackGPT_mode.read()
-    pass
+if hackgpt_persona == 'DAN':
+   hackGPT_mode = open('personas/DANv11.md' ,"r")
+   hackGPT_mode = hackGPT_mode.read()
+elif hackgpt_persona == 'chatGPT-DEV':
+   hackGPT_mode = open('personas/DEVv1.md' ,"r")
+   hackGPT_mode = hackGPT_mode.read()
+elif hackgpt_persona == 'hackGPT':
+   hackGPT_mode = open('personas/hackGPTv1.md' ,"r")
+   hackGPT_mode = hackGPT_mode.read()
 
 #print("For Additional Persona's Visit: \nhttp://www.jamessawyer.co.uk/pub/gpt_jb.html\nhttps://github.com/0xk1h0/ChatGPT_DAN ")
 #----------------------------------hackchatGPT---------------------------------------------------
@@ -204,29 +197,31 @@ def add_text(state, text):
     finally:
         return state, state
 def add_file(file_state, file):
-    with open(file.name, 'r') as targets:
-        search = targets.read()
-        response = openai.Completion.create(
-            model="text-davinci-003",
-            prompt=str(search)+"\n",
-            temperature=0,
-            max_tokens=3000,
-            top_p=1,
-            frequency_penalty=0,
-            presence_penalty=0,
-            stop=["\"\"\""]
-            )
-        
-    file_response = response['choices'][0]['text']
-    file_state = file_state + [("" + str(file_response), "Processed file: "+ str(file.name))]
-    try:
-        with open('output/chat_hackGPT_file_log.csv', 'a+', encoding='UTF8', newline='') as f:
-            w = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            w.writerow([date_string, hackgpt_persona, str(search).strip('\n'), str(response).lstrip('\n')])
-            f.close()
-    
-    finally:
-        return file_state, file_state
+   with open(file.name, 'r') as targets:
+       search = targets.read()
+       response = openai.Completion.create(
+           model="text-davinci-003",
+           prompt=str(search)+"\n",
+           temperature=0,
+           max_tokens=3000,
+           top_p=1,
+           frequency_penalty=0,
+           presence_penalty=0,
+           stop=["\"\"\""]
+           )
+
+   file_response = response['choices'][0]['text']
+   file_state = file_state + [
+       (f"{str(file_response)}", f"Processed file: {str(file.name)}")
+   ]
+   try:
+       with open('output/chat_hackGPT_file_log.csv', 'a+', encoding='UTF8', newline='') as f:
+           w = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+           w.writerow([date_string, hackgpt_persona, str(search).strip('\n'), str(response).lstrip('\n')])
+           f.close()
+
+   finally:
+       return file_state, file_state
             
 
 with gr.Blocks(css="#chatbot .output::-webkit-scrollbar {display: none;}") as hackerchat:

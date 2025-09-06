@@ -50,7 +50,7 @@ MODEL = st.sidebar.selectbox(label='Model', options=['gpt-3.5-turbo','gpt-3.5-tu
 default_temperature = 1.0
 temperature = st.sidebar.slider(
     "𝗧𝗲𝗺𝗽𝗲𝗿𝗮𝘁𝘂𝗿𝗲 | 𝗖𝗿𝗲𝗮𝘁𝗶𝘃𝗲 <𝟬.𝟱", min_value=0.0, max_value=1.0, step=0.1, value=default_temperature
-) 
+)
 max_tokens = st.sidebar.slider("𝗠𝗔𝗫 𝗢𝗨𝗧𝗣𝗨𝗧 𝗧𝗢𝗞𝗘𝗡𝗦", 10, 200, 2300)
 
 #Prompt Setups
@@ -77,11 +77,11 @@ with expand_section:
         if new_persona_name != selected_persona or new_persona_prompt != persona_text:
             with open(os.path.join("personas", f"{new_persona_name}.md"), "w") as f:
                 f.write(new_persona_prompt)
-            if new_persona_name != selected_persona:
-                os.remove(os.path.join("personas", f"{selected_persona}.md"))
-                persona_files.remove(selected_persona)
-                persona_files.append(new_persona_name)
-                selected_persona = new_persona_name
+        if new_persona_name != selected_persona:
+            os.remove(os.path.join("personas", f"{selected_persona}.md"))
+            persona_files.remove(selected_persona)
+            persona_files.append(new_persona_name)
+            selected_persona = new_persona_name
         if st.button("➖ Delete Persona"):
             if st.warning("Persona Deleted"):
                 os.remove(os.path.join("personas", f"{selected_persona}.md"))
@@ -94,8 +94,7 @@ with expand_section:
     show_remote_prompts = st.checkbox("Show remote prompt options")
     if selected_act and selected_act.strip():
         selected_prompt = data.loc[data['act'] == selected_act, 'prompt'].values[0]
-        confirm = st.button("Save Selected Persona")
-        if confirm:
+        if confirm := st.button("Save Selected Persona"):
             if not os.path.exists("personas"):
                 os.mkdir("personas")
             with open(os.path.join("personas", f"{selected_act}_remote.md"), "w") as f:
@@ -108,8 +107,7 @@ with expand_section:
     show_hack_prompts = st.checkbox("Show jailbreak options")
     if selected_hacker and selected_hacker.strip():
         selected_jailbreak_prompt = jailbreakdata.loc[jailbreakdata['hacker'] == selected_hacker, 'text'].values[0]
-        confirm = st.button("Save Selected Jailbreak")
-        if confirm:
+        if confirm := st.button("Save Selected Jailbreak"):
             if not os.path.exists("personas"):
                 os.mkdir("personas")
             with open(os.path.join("personas", f"{selected_hacker}_jailbreak.md"), "w") as f:
@@ -183,17 +181,17 @@ def add_text(text_input):
     return response['choices'][0]['text']
 
 try:
-    if st.session_state.chat_history == 0 :
+    if st.session_state.chat_history == 0:
         col1, col2, col3 ,col4, col5 = st.columns(5)
         col1.metric("Persona", selected_persona,selected_persona ) 
         col2.metric("Persona Count", len(persona_files),len(persona_files) ) 
         col3.metric("Jailbreaks", len(jailbreakdata), len(jailbreakdata))
         col4.metric("Model", MODEL)
         col5.metric("Model Count", len(MODEL), len(MODEL))
-        
-    elif st.session_state.chat_history != 0 :
+
+    else:
         col1, col2, col3 ,col4, col5, col6 = st.columns(6)
-        col1.metric("Persona", selected_persona,selected_persona ) 
+        col1.metric("Persona", selected_persona,selected_persona )
         col2.metric("Persona Count", len(persona_files),len(persona_files) )
         col3.metric("Jailbreaks", len(jailbreakdata), len(jailbreakdata))
         col4.metric("Model", MODEL)
@@ -201,7 +199,7 @@ try:
         col6.metric("Messages", len(st.session_state.chat_history), len(st.session_state.chat_history))
 except:
     pass
-   
+
 
 #st.sidebar.header("File Upload")
 file = st.sidebar.file_uploader("", type=["txt"])
@@ -274,14 +272,10 @@ st.markdown(ai_css, unsafe_allow_html=True)
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
 def display_chat_history():
+    alignment = 'left'
+
     for i, (role, text) in reversed(list(enumerate(st.session_state.chat_history))):
-        alignment = 'left' if role == 'user' else 'left'
-
-        if role == 'user':
-            margin = 'margin-bottom: 1px;'
-        else:
-            margin = 'margin-top: 8px;'
-
+        margin = 'margin-bottom: 1px;' if role == 'user' else 'margin-top: 8px;'
         col1, col2 = st.columns([2, 8])
         with col1:
             if role == 'user':
@@ -295,25 +289,23 @@ def display_chat_history():
                 st.markdown(f'<div style="text-align: {alignment}; {margin}" class="{role}">{text}</div>', unsafe_allow_html=True)
             if role == 'persona':
                 st.markdown(f'<div style="text-align: right; color: orange;" class="{role}">{text}</div>', unsafe_allow_html=True)
-st.write("")  
-text_input = st.text_input("", value="", key="text_input", placeholder="Type your message here...", help="Press Enter to send your message.")
-if MODEL == 'gpt-3.5-turbo' or MODEL == 'gpt-4' or MODEL == 'gpt-3.5-turbo-0301' or MODEL == 'gpt-4-0314':
-    if text_input:
+st.write("")
+if text_input := st.text_input(
+    "",
+    value="",
+    key="text_input",
+    placeholder="Type your message here...",
+    help="Press Enter to send your message.",
+):
+    if MODEL in ['gpt-3.5-turbo', 'gpt-4', 'gpt-3.5-turbo-0301', 'gpt-4-0314']:
         ai_response = get_ai_response(text_input)
         st.session_state.chat_history.append(('ai', f"{ai_response}"))
-        st.session_state.chat_history.append(('persona', f"{selected_persona}"))
-        st.session_state.chat_history.append(('user', f"You: {text_input}"))
-        st.session_state.chat_history.append(('model', f"{MODEL}"))
-
-
-elif MODEL != 'gpt-3.5-turbo' or MODEL != 'gpt-4' or MODEL != 'gpt-3.5-turbo-0301' or MODEL != 'gpt-4-0314':
-    if text_input:
+    else:
         ai_responses = add_text(text_input)
         st.session_state.chat_history.append(('ai', f"{ai_responses}"))
-        #st.session_state.chat_history.append(('ai', f"{line}"))
-        st.session_state.chat_history.append(('persona', f"{selected_persona}"))
-        st.session_state.chat_history.append(('user', f"You: {text_input}"))
-        st.session_state.chat_history.append(('model', f"{MODEL}"))
+    st.session_state.chat_history.append(('persona', f"{selected_persona}"))
+    st.session_state.chat_history.append(('user', f"You: {text_input}"))
+    st.session_state.chat_history.append(('model', f"{MODEL}"))
 
 
 display_chat_history()

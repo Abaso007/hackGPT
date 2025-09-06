@@ -52,7 +52,7 @@ st.markdown("----")
 
 
 
-    
+
 url = "https://raw.githubusercontent.com/NoDataFound/hackGPT/main/hackerParents/social_data.csv"
 data = pd.read_csv(url)
 new_row = pd.DataFrame({"Social Media": [" "], "Privacy Policy Link": [""]})
@@ -62,7 +62,7 @@ data = pd.concat([data, new_row], ignore_index=True)
 social_media = data['Social Media']
 privacy_link = data['Privacy Policy Link']
 col1, col2, col3 = st.columns(3)
-col1.metric("Current Parent", selected_persona,selected_persona ) 
+col1.metric("Current Parent", selected_persona,selected_persona )
 col2.metric("Parents Available", len(persona_files),len(persona_files) )
 col3.metric("Social Media Services", len(data),len(data) )
 # Filter
@@ -88,11 +88,11 @@ with expand_section:
         if new_persona_name != selected_persona or new_persona_prompt != persona_text:
             with open(os.path.join("hackerParents/parent_persona", f"{new_persona_name}.md"), "w") as f:
                 f.write(new_persona_prompt)
-            if new_persona_name != selected_persona:
-                os.remove(os.path.join("hackerParents/parent_persona", f"{selected_persona}.md"))
-                persona_files.remove(selected_persona)
-                persona_files.append(new_persona_name)
-                selected_persona = new_persona_name
+        if new_persona_name != selected_persona:
+            os.remove(os.path.join("hackerParents/parent_persona", f"{selected_persona}.md"))
+            persona_files.remove(selected_persona)
+            persona_files.append(new_persona_name)
+            selected_persona = new_persona_name
         if st.button("➖ Delete Persona"):
             if st.warning("Persona Deleted"):
                 os.remove(os.path.join("hackerParents/parent_persona", f"{selected_persona}.md"))

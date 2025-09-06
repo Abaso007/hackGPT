@@ -18,7 +18,7 @@ from alive_progress import alive_bar
 from time import sleep
 import openai
 from dotenv import load_dotenv
-load_dotenv()  
+load_dotenv()
 apiToken = os.environ.get("OPENAI_TOKEN")
 #pwntxt= r"""
 #                :                                                    :
@@ -40,13 +40,11 @@ apiToken = os.environ.get("OPENAI_TOKEN")
 #   ╚────────────────────────────────────┴───────────────────────────────────────╝"""
 #fadedpwn = fade.purplepink(pwntxt)
 #print(fadedpwn)
-load_dotenv(".env")  
+load_dotenv(".env")
 apiToken = os.environ.get('OPENAI_TOKEN')
 openai.api_key = apiToken
 
-if 'OPENAI_TOKEN' in os.environ:
-   pass
-else:
+if 'OPENAI_TOKEN' not in os.environ:
    error='''           
                      *   )           )            (   
                      `(     ( /((        (  (      )\   
@@ -71,7 +69,7 @@ else:
    setting_token = open(".env", "a")
    userkey = input('Enter API Key: ').replace(" ","")
    setting_token.write("OPENAI_TOKEN="+'"'+userkey+'"')
-   
+
 targets = input("Enter Filename: (Press enter for 'input/sample_sources' ) ") or "input/sample_sources"
 #investigation = input("Enter name for your investigation: ")
 
@@ -94,7 +92,7 @@ fadedsearch =r"""
                                       '        
 ─ ──+──── ──  ─   ────────────────────────────────────────────────────────   ─  ── ────+── ─
  """ 
-                                                     
+
 tookewl=fade.purplepink(fadedsearch)
 print(tookewl)
 
@@ -106,44 +104,39 @@ faded_seperator = fade.water(seperator)
 print(faded_seperator)
 openai_targets = []
 
-if 'OPENAI_TOKEN' in os.environ:
-    pass
-else:
-    os.environ['OPENAI_TOKEN'] = input('Enter API Key: ').replace(" ","")
+if 'OPENAI_TOKEN' not in os.environ:
+   os.environ['OPENAI_TOKEN'] = input('Enter API Key: ').replace(" ","")
 #f_jsonpath = 'output/'+investigation+'/results'
 token = os.environ.get("OPENAI_TOKEN")
 
-os.mkdir('output/'+investigation)
-os.mkdir('output/'+investigation+'/results/')
+os.mkdir(f'output/{investigation}')
+os.mkdir(f'output/{investigation}/results/')
 
 with open(targets, 'r') as targets:
-    for line in targets:
-        openai_targets.append(line)
-        
-    
-    for search in openai_targets:
-        #search = search.strip()
-        response = openai.Completion.create(
-        model="text-davinci-003",
-        prompt=search+"\n\n",
-        temperature=0,
-        max_tokens=64,
-        top_p=1,
-        frequency_penalty=0,
-        presence_penalty=0,
-        stop=["\"\"\""]
-        )
-        response = response['choices'][0]['text']
-        #with open('output/'+investigation+'/results/'+str(search.rsplit('/', 1)[-1])+ ".txt", "w") as f:
-        #    f.write(response)
-        fadedresponse = fade.greenblue(response)
+   openai_targets.extend(iter(targets))
+   for search in openai_targets:
+       #search = search.strip()
+       response = openai.Completion.create(
+       model="text-davinci-003",
+       prompt=search+"\n\n",
+       temperature=0,
+       max_tokens=64,
+       top_p=1,
+       frequency_penalty=0,
+       presence_penalty=0,
+       stop=["\"\"\""]
+       )
+       response = response['choices'][0]['text']
+       #with open('output/'+investigation+'/results/'+str(search.rsplit('/', 1)[-1])+ ".txt", "w") as f:
+       #    f.write(response)
+       fadedresponse = fade.greenblue(response)
 
-        print(' '*39+"🆁🅴🆂🆄🅻🆃🆂\n" + "𝘚𝘦𝘢𝘳𝘤𝘩 𝘴𝘰𝘶𝘳𝘤𝘦 𝘪𝘯𝘱𝘶𝘵:"+ str(search).strip())
-        print("\n\033[36mHere's your code:")
-        sleep(5)
-        print(fadedresponse)
-        print(faded_seperator)
-        
+       print(' '*39+"🆁🅴🆂🆄🅻🆃🆂\n" + "𝘚𝘦𝘢𝘳𝘤𝘩 𝘴𝘰𝘶𝘳𝘤𝘦 𝘪𝘯𝘱𝘶𝘵:"+ str(search).strip())
+       print("\n\033[36mHere's your code:")
+       sleep(5)
+       print(fadedresponse)
+       print(faded_seperator)
+
 
 
 #path = Tree(f_jsonpath, absolute=False)

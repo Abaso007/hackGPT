@@ -29,10 +29,8 @@ load_dotenv(".env")
 apiToken = os.environ.get('OPENAI_TOKEN')
 openai.api_key = apiToken
 
-if 'OPENAI_TOKEN' in os.environ:
-   pass
-else:
-  error='''           
+if 'OPENAI_TOKEN' not in os.environ:
+   error='''           
                      *   )           )            (   
                      `(     ( /((        (  (      )\   
                       )\(   )\())\  (    )\))(  ((((_) 
@@ -45,12 +43,12 @@ else:
                      88eee 88   8 88   8 8eeee8 88   8 
                                   
    \033[1;33mAttempting to Set OpenAI system variable with API key.'''
-  fadederror = fade.fire(error)
-  print(fadederror)
-  Path(".env").touch()
-  setting_token = open(".env", "a")
-  userkey = input('Enter OpenAI API Key: ').replace(" ","")
-  setting_token.write("OPENAI_TOKEN="+'"'+userkey+'"\n')
+   fadederror = fade.fire(error)
+   print(fadederror)
+   Path(".env").touch()
+   setting_token = open(".env", "a")
+   userkey = input('Enter OpenAI API Key: ').replace(" ","")
+   setting_token.write("OPENAI_TOKEN="+'"'+userkey+'"\n')
 def progress(percent=0, width=15):
     hashes = width * percent // 100
     blanks = width - hashes
@@ -70,18 +68,16 @@ hackGPT_mode = open('personas/hackGPTv1.md' ,"r")
 hackGPT_mode = hackGPT_mode.read()
 date_string = datetime.datetime.now()
 
-load_dotenv()  
+load_dotenv()
 apiToken = os.environ.get("OPENAI_TOKEN")
 headers = {
-                    "Accept": "application/json; charset=utf-8",
-                    "Authorization": "Token" + str(apiToken)
-                }
+    "Accept": "application/json; charset=utf-8",
+    "Authorization": f"Token{str(apiToken)}",
+}
 
 
-if 'OPENAI_TOKEN' in os.environ:
-    pass
-else:
-    os.environ['OPENAI_TOKEN'] = input('Enter API Key: ').replace(" ","")
+if 'OPENAI_TOKEN' not in os.environ:
+   os.environ['OPENAI_TOKEN'] = input('Enter API Key: ').replace(" ","")
 token = os.environ.get("OPENAI_TOKEN")
 hack=  "\n"*7 + r""" 
 
@@ -144,29 +140,31 @@ def add_text(state, text):
         return state, state
 
 def add_file(file_state, file):
-    with open(file.name, 'r') as targets:
-        search = targets.read()
-        response = openai.Completion.create(
-            model="text-davinci-003",
-            prompt=str(search)+"\n",
-            temperature=0,
-            max_tokens=3000,
-            top_p=1,
-            frequency_penalty=0,
-            presence_penalty=0,
-            stop=["\"\"\""]
-            )
-        
-    file_response = response['choices'][0]['text']
-    file_state = file_state + [("" + str(file_response), "Processed file: "+ str(file.name))]
-    try:
-        with open('output/chat_hackGPT_file_log.csv', 'a+', encoding='UTF8', newline='') as f:
-            w = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            w.writerow([date_string, 'hackGPTv1', str(search).strip('\n'), str(response).lstrip('\n')])
-            f.close()
-    
-    finally:
-        return file_state, file_state
+   with open(file.name, 'r') as targets:
+       search = targets.read()
+       response = openai.Completion.create(
+           model="text-davinci-003",
+           prompt=str(search)+"\n",
+           temperature=0,
+           max_tokens=3000,
+           top_p=1,
+           frequency_penalty=0,
+           presence_penalty=0,
+           stop=["\"\"\""]
+           )
+
+   file_response = response['choices'][0]['text']
+   file_state = file_state + [
+       (f"{str(file_response)}", f"Processed file: {str(file.name)}")
+   ]
+   try:
+       with open('output/chat_hackGPT_file_log.csv', 'a+', encoding='UTF8', newline='') as f:
+           w = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+           w.writerow([date_string, 'hackGPTv1', str(search).strip('\n'), str(response).lstrip('\n')])
+           f.close()
+
+   finally:
+       return file_state, file_state
             
 
 
